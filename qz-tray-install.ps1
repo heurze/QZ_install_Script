@@ -8,11 +8,11 @@ $installerPath = "$env:Temp\qz-tray-2.2.4-x86_64.exe"
 
 # Elimina la versión anterior (2.0.6) de QZ Tray
 $oldAppName = "QZ Tray $oldVersion"
-$oldAppPath = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq $oldAppName }
+$oldAppPath = Get-Package | Where-Object {$_.Name -like "*$oldAppName*"} | Format-Table -AutoSize
 
 if ($oldAppPath) {
     Write-Host "Desinstalando $oldAppName..."
-    $oldAppPath.Uninstall()
+    Uninstall-Package -Name $oldAppName -Provider "Programs" -Force
     Write-Host "Desinstalación completada."
 } else {
     Write-Host "$oldAppName no encontrado. Continuando con la instalación de la nueva versión."
@@ -24,7 +24,7 @@ Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
 
 # Instala la nueva versión (2.2.4)
 Write-Host "Instalando QZ Tray $newVersion..."
-Start-Process -FilePath $installerPath -ArgumentList "/silent" -Wait
+Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait
 
 # Limpia el archivo de instalación temporal
 Remove-Item -Path $installerPath
